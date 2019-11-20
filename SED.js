@@ -2,12 +2,14 @@
 const yargs = require("yargs");
 const fs = require("fs");
 let myRegex = /^s\/[^\/]+\/[^\/]+\/[g|p]?$/;
+// Define yargs keys with their respective conditions
 yargs.nargs("e", 1);
 yargs.boolean("n");
 yargs.nargs("i", 1);
 yargs.nargs("f", 1);
 SED();
 
+//Function for trying a command on a line
 function eOption(line, command) {
   if (!validCommand(command)) {
     process.exit();
@@ -22,15 +24,14 @@ function eOption(line, command) {
   if (flag === "p" && newLine !== line) console.log(newLine);
   return newLine;
 }
-
+// Validate each command
 function validCommand(command) {
   if (myRegex.test(command)) return true;
   else return false;
 }
-
-function fOption(line, file) {
+//Get all the commands from the script file
+function fOption(file, args) {
   let instructions;
-  let newLine = line;
   if (!fileExists(file)) {
     console.log("The script file doesn't exist");
     return;
@@ -42,15 +43,15 @@ function fOption(line, file) {
     console.log("Error:", e.stack);
   }
   for (let instruction of instructions) {
-    newLine = eOption(newLine, instruction);
+    args.push(instruction);
   }
-  return newLine;
+  return;
 }
-
+// Save line to the chosen file
 function saveLine(line, file) {
   fs.appendFileSync(file + "-copy", line + "\n");
 }
-
+// "MAIN"
 function SED() {
   // Variables declaration
   let printable = true;
@@ -82,26 +83,25 @@ function SED() {
   lines = readFile(file);
   // Get all the commands from each e and f option entered
   if (typeof yargs.argv.e === "string") {
-    args.push({ type: "e", instructions: yargs.argv.e });
+    args.push(yargs.argv.e);
   } else if (typeof yargs.argv.e === "object") {
     for (let script of yargs.argv.e) {
-      args.push({ type: "e", instructions: script });
+      args.push(script);
     }
   }
   if (typeof yargs.argv.f === "string") {
-    args.push({ type: "f", instructions: yargs.argv.f });
+    fOption(yargs.argv.f, args);
   } else if (typeof yargs.argv.f === "object") {
-    for (let script of yargs.argv.f) {
-      args.push({ type: "f", instructions: script });
-    }
+    fOption(file, args);
   }
+  //Create backup file if needed
   if (save === true && !(yargs.argv.i === "")) {
     let backUp = file + "." + yargs.argv.i;
     fs.copyFileSync(file, backUp);
   }
   // Execute all the commands on each line
   for (let line of lines) {
-    newLine = Substitute(args, line);
+    newLine = substitute(args, line);
     if (printable === true) console.log(newLine);
     if (save === true) saveLine(newLine, file);
   }
@@ -110,16 +110,15 @@ function SED() {
     unlinkFile(file);
   }
 }
-
-function Substitute(args, line) {
+//Try every command on a line
+function substitute(args, line) {
   newLine = line;
   for (let arg of args) {
-    if (arg.type === "e") newLine = eOption(newLine, arg.instructions);
-    if (arg.type === "f") newLine = fOption(newLine, arg.instructions);
+    newLine = eOption(newLine, arg);
   }
   return newLine;
 }
-
+// For reading... the file
 function readFile(file) {
   try {
     var data = fs.readFileSync(file);
@@ -130,7 +129,7 @@ function readFile(file) {
     return;
   }
 }
-
+// Delete old file and rename the temporary file
 function unlinkFile(file) {
   fs.unlink(file, function(err) {
     if (err) throw err;
@@ -141,7 +140,7 @@ function unlinkFile(file) {
     console.log("File Renamed!");
   });
 }
-
+// Checking file integrity :)
 function fileExists(file) {
   try {
     if (fs.existsSync(file)) {
