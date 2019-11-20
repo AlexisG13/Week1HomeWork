@@ -1,0 +1,2 @@
+s/world/mundo/g
+s/hello/bye/g
