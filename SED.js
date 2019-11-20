@@ -4,7 +4,7 @@ const fs = require("fs");
 let myRegex = /^s\/[^\/]+\/[^\/]+\/[g|p]?$/;
 yargs.nargs("e", 1);
 yargs.boolean("n");
-yargs.boolean("i");
+yargs.nargs("i", 1);
 yargs.nargs("f", 1);
 SED();
 
@@ -94,6 +94,10 @@ function SED() {
     for (let script of yargs.argv.f) {
       args.push({ type: "f", instructions: script });
     }
+  }
+  if (save === true && !(yargs.argv.i === "")) {
+    let backUp = file + "." + yargs.argv.i;
+    fs.copyFileSync(file, backUp);
   }
   // Execute all the commands on each line
   for (let line of lines) {
