@@ -19,7 +19,8 @@ function eOption(line, command) {
   let oldWord = commandList[1];
   let newWord = commandList[2];
   let flag = commandList[3];
-  let regObj = new RegExp(oldWord, flag);
+  let regObj = new RegExp(oldWord);
+  if (flag === "g") regObj = new RegExp(oldWord, g);
   let newLine = line.replace(regObj, newWord);
   if (flag === "p" && newLine !== line) console.log(newLine);
   return newLine;

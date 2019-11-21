@@ -1,2 +1,3 @@
-s/mundo/world/g
-s/hello/bye/g
+s/mundo/world/p
+s/hello/bye/p
+s/linux/mint/p
