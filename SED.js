@@ -55,14 +55,13 @@ function multipleFiles() {
   if (fileRegex.test(yargs.argv._[0])) {
     for (let file of yargs.argv._) {
       SED(file, false);
-      return;
     }
     return;
   } else if (myRegex.test(yargs.argv._[0])) {
     for (let file of yargs.argv._.slice(1)) {
       SED(file, true);
-      return;
     }
+    return;
   }
   console.log("Wrong command or unexisting file entered!");
 }
