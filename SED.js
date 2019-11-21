@@ -7,7 +7,7 @@ yargs.nargs("e", 1);
 yargs.boolean("n");
 yargs.nargs("i", 1);
 yargs.nargs("f", 1);
-main();
+SED();
 
 //Function for trying a command on a line
 function eOption(line, command) {
@@ -52,23 +52,13 @@ function fOption(file, args) {
 function saveLine(line, file) {
   fs.appendFileSync(file + "-copy", line + "\n");
 }
-function main() {
-  let index = 1;
-  if (yargs.argv._.length > 1) {
-    if (!myRegex.test(yargs.argv._[0])) index = 0;
-    for (let file of yargs.argv._.slice(index)) {
-      SED(file);
-    }
-  } else {
-    SED(yargs.argv._[0]);
-  }
-}
 // "MAIN"
-function SED(file) {
+function SED() {
   // Variables declaration
   let printable = true;
   let save = false;
   let newLine;
+  let file = null;
   let args = [];
   let lines;
   // The n option was used, don't print.
@@ -78,11 +68,12 @@ function SED(file) {
     printable = false;
     save = true;
   }
-  // If the length is greater than 1, the -e option was called
+  // If the length is greater than 1, the e option was called
   if (yargs.argv._.length > 1) {
-    if (myRegex.test(yargs.argv._[0])) {
-      args.push(yargs.argv._[0]);
-    }
+    file = yargs.argv._[1];
+    args.push(yargs.argv._[0]);
+  } else {
+    file = yargs.argv._[0];
   }
   // Check if file exists
   if (!fileExists(file)) {
