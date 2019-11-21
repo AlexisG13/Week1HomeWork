@@ -7,7 +7,7 @@ yargs.nargs("e", 1);
 yargs.boolean("n");
 yargs.nargs("i", 1);
 yargs.nargs("f", 1);
-SED();
+main();
 
 //Function for trying a command on a line
 function eOption(line, command) {
@@ -52,13 +52,19 @@ function fOption(file, args) {
 function saveLine(line, file) {
   fs.appendFileSync(file + "-copy", line + "\n");
 }
+function main() {
+  if (yargs.argv._.length > 1) {
+    for (let file of yargs.argv._.slice(1)) {
+      SED(file);
+    }
+  }
+}
 // "MAIN"
-function SED() {
+function SED(file) {
   // Variables declaration
   let printable = true;
   let save = false;
   let newLine;
-  let file = null;
   let args = [];
   let lines;
   // The n option was used, don't print.
@@ -70,10 +76,7 @@ function SED() {
   }
   // If the length is greater than 1, the e option was called
   if (yargs.argv._.length > 1) {
-    file = yargs.argv._[1];
     args.push(yargs.argv._[0]);
-  } else {
-    file = yargs.argv._[0];
   }
   // Check if file exists
   if (!fileExists(file)) {
