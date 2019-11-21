@@ -70,7 +70,7 @@ function SED() {
   // If the length is greater than 1, the e option was called
   if (yargs.argv._.length > 1) {
     file = yargs.argv._[1];
-    args.push({ type: "e", instructions: yargs.argv._[0] });
+    args.push(yargs.argv._[0]);
   } else {
     file = yargs.argv._[0];
   }
@@ -133,11 +133,9 @@ function readFile(file) {
 function unlinkFile(file) {
   fs.unlink(file, function(err) {
     if (err) throw err;
-    console.log("File deleted!");
   });
   fs.rename(file + "-copy", file, function(err) {
     if (err) throw err;
-    console.log("File Renamed!");
   });
 }
 // Checking file integrity :)
