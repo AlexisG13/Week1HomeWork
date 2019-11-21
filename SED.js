@@ -42,7 +42,7 @@ function fOption(file, args) {
     var data = fs.readFileSync(file);
     instructions = data.toString().split("\n");
   } catch (e) {
-    console.log("Error:", e.stack);
+    console.log("Error when reading the script file");
     return;
   }
   for (let instruction of instructions) {
@@ -55,13 +55,16 @@ function multipleFiles() {
   if (fileRegex.test(yargs.argv._[0])) {
     for (let file of yargs.argv._) {
       SED(file, false);
+      return;
     }
     return;
   } else if (myRegex.test(yargs.argv._[0])) {
     for (let file of yargs.argv._.slice(1)) {
       SED(file, true);
+      return;
     }
   }
+  console.log("Wrong command or unexisting file entered!");
 }
 
 // Save line to the chosen file
@@ -138,17 +141,19 @@ function readFile(file) {
     let lines = data.toString().split("\n");
     return lines;
   } catch (e) {
-    console.log("Error:", e.stack);
+    console.log("Error when reading the file! :(");
     return;
   }
 }
 // Delete old file and rename the temporary file
 function unlinkFile(file) {
   fs.unlink(file, function(err) {
-    if (err) throw err;
+    if (err) console.log("Error deleting the old file :(");
+    return;
   });
   fs.rename(file + "-copy", file, function(err) {
-    if (err) throw err;
+    if (err) console.log("Error renaming the temporary file :(");
+    return;
   });
 }
 // Checking file integrity :)
