@@ -12,14 +12,14 @@ SED();
 //Function for trying a command on a line
 function eOption(line, command) {
   if (!validCommand(command)) {
+    console.log("Unknown command entered! :(");
     process.exit();
   }
   let commandList = command.split("/");
   let oldWord = commandList[1];
   let newWord = commandList[2];
   let flag = commandList[3];
-  let regObj = new RegExp(oldWord);
-  if (flag === "g") regObj = new RegExp(oldWord, "g");
+  let regObj = new RegExp(oldWord, flag);
   let newLine = line.replace(regObj, newWord);
   if (flag === "p" && newLine !== line) console.log(newLine);
   return newLine;
@@ -41,6 +41,7 @@ function fOption(file, args) {
     instructions = data.toString().split("\n");
   } catch (e) {
     console.log("Error:", e.stack);
+    return;
   }
   for (let instruction of instructions) {
     args.push(instruction);
