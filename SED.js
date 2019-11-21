@@ -53,10 +53,14 @@ function saveLine(line, file) {
   fs.appendFileSync(file + "-copy", line + "\n");
 }
 function main() {
+  let index = 1;
   if (yargs.argv._.length > 1) {
-    for (let file of yargs.argv._.slice(1)) {
+    if (!myRegex.test(yargs.argv._[0])) index = 0;
+    for (let file of yargs.argv._.slice(index)) {
       SED(file);
     }
+  } else {
+    SED(yargs.argv._[0]);
   }
 }
 // "MAIN"
@@ -74,9 +78,11 @@ function SED(file) {
     printable = false;
     save = true;
   }
-  // If the length is greater than 1, the e option was called
+  // If the length is greater than 1, the -e option was called
   if (yargs.argv._.length > 1) {
-    args.push(yargs.argv._[0]);
+    if (myRegex.test(yargs.argv._[0])) {
+      args.push(yargs.argv._[0]);
+    }
   }
   // Check if file exists
   if (!fileExists(file)) {
