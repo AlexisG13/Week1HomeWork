@@ -50,16 +50,14 @@ function fOption(file, args) {
   }
   return;
 }
-
+//Checking if the first argument is either a file or a command (without -e)
 function multipleFiles() {
   if (fileRegex.test(yargs.argv._[0])) {
-    console.log("no e option");
     for (let file of yargs.argv._) {
       SED(file, false);
     }
     return;
   } else if (myRegex.test(yargs.argv._[0])) {
-    console.log("e option");
     for (let file of yargs.argv._.slice(1)) {
       SED(file, true);
     }
