@@ -2,12 +2,13 @@
 const yargs = require("yargs");
 const fs = require("fs");
 let myRegex = /^s\/[^\/]+\/[^\/]+\/[g|p]?$/;
+let fileRegex = /^[^\/]+\.[^\/]+/;
 // Define yargs keys with their respective conditions
 yargs.nargs("e", 1);
 yargs.boolean("n");
 yargs.nargs("i", 1);
 yargs.nargs("f", 1);
-SED();
+multipleFiles();
 
 //Function for trying a command on a line
 function eOption(line, command) {
@@ -20,7 +21,7 @@ function eOption(line, command) {
   let newWord = commandList[2];
   let flag = commandList[3];
   let regObj = new RegExp(oldWord);
-  if (flag === "g") regObj = new RegExp(oldWord, g);
+  if (flag === "g") regObj = new RegExp(oldWord, "g");
   let newLine = line.replace(regObj, newWord);
   if (flag === "p" && newLine !== line) console.log(newLine);
   return newLine;
@@ -49,17 +50,32 @@ function fOption(file, args) {
   }
   return;
 }
+
+function multipleFiles() {
+  if (fileRegex.test(yargs.argv._[0])) {
+    console.log("no e option");
+    for (let file of yargs.argv._) {
+      SED(file, false);
+    }
+    return;
+  } else if (myRegex.test(yargs.argv._[0])) {
+    console.log("e option");
+    for (let file of yargs.argv._.slice(1)) {
+      SED(file, true);
+    }
+  }
+}
+
 // Save line to the chosen file
 function saveLine(line, file) {
   fs.appendFileSync(file + "-copy", line + "\n");
 }
 // "MAIN"
-function SED() {
+function SED(file, noEOption) {
   // Variables declaration
   let printable = true;
   let save = false;
   let newLine;
-  let file = null;
   let args = [];
   let lines;
   // The n option was used, don't print.
@@ -70,11 +86,8 @@ function SED() {
     save = true;
   }
   // If the length is greater than 1, the e option was called
-  if (yargs.argv._.length > 1) {
-    file = yargs.argv._[1];
+  if (noEOption === true) {
     args.push(yargs.argv._[0]);
-  } else {
-    file = yargs.argv._[0];
   }
   // Check if file exists
   if (!fileExists(file)) {
